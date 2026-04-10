@@ -24,7 +24,6 @@ function runDailyCheck() {
   }
 
   const today     = Utilities.formatDate(new Date(), 'Asia/Seoul', 'yyMMdd');
-  Logger.log('실행 날짜: ' + today);
 
   const folder    = DriveApp.getFolderById(DRIVE_FOLDER_ID);
   const files     = folder.getFiles();
@@ -44,12 +43,7 @@ function runDailyCheck() {
     if (!fileName.startsWith(today)) continue;
 
     // 이미 포스팅된 파일은 건너뜀 (중복 방지)
-    if (postedIds.has(fileId)) {
-      Logger.log('[스킵] 이미 포스팅됨: ' + fileName);
-      continue;
-    }
-
-    Logger.log('[처리] ' + fileName);
+    if (postedIds.has(fileId)) continue;
 
     try {
       const caseName = fileName.replace(/^\d{6}[_\s]*/, '').trim();
@@ -76,7 +70,10 @@ function runDailyCheck() {
   }
 
   savePostedIds(postedIds);
-  Logger.log('=== 완료: 신규 ' + newCount + '개 포스트 ===');
+  // 새 파일이 있을 때만 로그 기록 (없으면 조용히 종료)
+  if (newCount > 0) {
+    Logger.log('=== 완료: 신규 ' + newCount + '개 포스트 ===');
+  }
 }
 
 // ── Google Docs → 정제된 HTML 변환 ───────────────────────
